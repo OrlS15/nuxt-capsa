@@ -12,10 +12,10 @@ export default createConfigForNuxt({
   dirs: {
     src: [
       './playground',
-      './test/fixtures/auth-pglite/app',
     ],
   },
 })
   .append(
-    // your custom flat config here...
+    // What capsa generates, kept as it comes out: the tests compare it, nothing lints it.
+    { ignores: ['test/**/__snapshots__/**'] },
   )

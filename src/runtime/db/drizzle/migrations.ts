@@ -3,7 +3,7 @@
  * where there is no filesystem.
  *
  * `readMigrations` mirrors `readMigrationFiles` of drizzle-orm 1.0.0-rc.5 (`migrator.js`), which only reads from disk.
- * `test/db/migrations.test.ts` fails as soon as drizzle's output drifts.
+ * `test/db/library.test.ts` fails as soon as drizzle's output drifts.
  */
 
 import type { Source } from './source'

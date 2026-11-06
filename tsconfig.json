@@ -7,5 +7,7 @@
     "playground",
     // Each fixture is an app of its own, typed by its own .nuxt.
     "test/fixtures",
+    // What capsa generates, which imports an app's own modules.
+    "test/**/__snapshots__",
   ]
 }

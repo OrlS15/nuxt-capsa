@@ -1,9 +1,0 @@
-{
-  // drizzle-kit reads its aliases from the tsconfig.json nearest to drizzle.config.ts. A real project
-  // has `.nuxt/tsconfig.json` there; the test build writes none, so this gives it the one it needs.
-  "compilerOptions": {
-    "paths": {
-      "nuxt-capsa/db": ["../../../src/runtime/db"]
-    }
-  }
-}

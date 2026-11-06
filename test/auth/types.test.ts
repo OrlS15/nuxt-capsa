@@ -1,7 +1,7 @@
 import { fileURLToPath } from 'node:url'
 import { describe, expect, it } from 'vitest'
 import { renderServerTypes, renderTypes } from '../../src/auth/templates'
-import { typeErrors } from '../db/nuxt'
+import { typeErrors } from '../helpers/types'
 
 /** Where the files are, as a path the compiler resolves. */
 const at = (path: string) => fileURLToPath(new URL(path, import.meta.url))
@@ -47,7 +47,25 @@ export default defineAbilities({
 const SIGN_UP = `{ email: 'ada@example.com', password: 'password1234', name: 'Ada', plan: 'pro' }`
 
 // Each test compiles against better-auth's own types: a few seconds each on a busy machine, past vitest's default of 5.
-describe('types of the auth feature', { timeout: 30_000 }, () => {
+describe('better-auth\'s types, where capsa expects them', { timeout: 30_000 }, () => {
+  // What capsa's runtime declares of better-auth before any type is generated: the real one has to fit it.
+  it('lets the real betterAuth, env, instance and client stand where capsa\'s runtime takes them', async () => {
+    const errors = await typeErrors({
+      'contract.ts': `import { betterAuth, env } from 'better-auth'
+import { createAuthClient } from 'better-auth/vue'
+import type { AuthClient, AuthInstance } from 'nuxt-capsa/auth'
+import type { AuthParts } from 'nuxt-capsa/auth/server'
+
+export const parts: Pick<AuthParts, 'betterAuth' | 'env'> = { betterAuth, env }
+export const instance: AuthInstance = betterAuth({ emailAndPassword: { enabled: true } })
+export const client: AuthClient = createAuthClient({ baseURL: 'http://localhost:3000' })`,
+    }, app)
+
+    expect(errors).toEqual([])
+  })
+})
+
+describe('the types capsa generates for auth', { timeout: 30_000 }, () => {
   it('types the session, the server instance and the client from the two config files', async () => {
     const errors = await typeErrors({
       'auth.d.ts': renderTypes('./server-config', './client-config', []),
