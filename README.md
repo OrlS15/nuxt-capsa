@@ -9,13 +9,7 @@ Every production app rebuilds the same backend plumbing: a database with migrati
 
 **Available today:** [Database](#database), [Auth](#auth), [Drive](#drive). **Coming next:** mailer, queues, typed runtime config, a database studio ([roadmap](#roadmap)).
 
-Each feature is built on a library you already know and install yourself. Today those are [Drizzle](https://orm.drizzle.team), [better-auth](https://better-auth.com) and [files-sdk](https://files-sdk.dev). You write your files in the folders Capsa expects, and Capsa generates the code that wires them into Nuxt:
-
-- typed auto-imports for server and app code
-- connections and secrets from environment variables
-- migrations shipped inside the server bundle
-- route protection, with permission rules shared by server and app
-- signed links for local files
+Each feature is built on a library you already know and install yourself. Today those are [Drizzle](https://orm.drizzle.team), [better-auth](https://better-auth.com) and [files-sdk](https://files-sdk.dev). You write your files in the folders Capsa expects, and Capsa generates the code that wires them into Nuxt.
 
 ```ts
 // nuxt.config.ts
@@ -42,6 +36,63 @@ server/capsa/
 └── drive/default/config.ts  # optional: adapter options, files-sdk plugins
 shared/capsa/abilities.ts    # permission rules, for server and app
 ```
+
+## Why it feels good
+
+**No glue code.** You don't write a `server/utils/db.ts`, a session plugin, an auth middleware or a storage client. These are just there, typed:
+
+```ts
+// server: any API route
+const posts = await useCapsaDb().query.posts.findMany({ with: { author: true } })
+await useCapsaDrive().upload(`avatars/${user.id}.png`, file)
+```
+
+```vue
+<!-- app: any component -->
+<script setup lang="ts">
+const { user, loggedIn, signOut, can } = useCapsaSession()
+</script>
+```
+
+**Typed from your own files.** Capsa generates types from what you write, so the editor knows your project:
+
+```ts
+useCapsaDb('analytic')                     // ✗ '"default" | "analytics"': lists your databases
+requireSession(event, 'posts.edit', post)  // rule names autocomplete, `post` is checked against the rule
+defineDbConfig('default', { options: () => ({ logger: true }) })  // options typed by that database's driver
+defineDriveConfig('avatars', { options: () => ({ forcePathStyle: true }) })  // options typed by that disk's adapter
+```
+
+**One set of rules, everywhere.** Write a permission once in `shared/`. It guards your API (`requireSession`), your pages (`authorize`) and your templates (`<Can>`, `can()`), with the same name, the same arguments and the same refusal codes.
+
+**Mistakes stop the build, not production.**
+
+```text
+[capsa] "/dashboard" is guarded by capsa.auth.routes and cached by a route rule (`swr`, `isr`, …):
+        the cached page would carry one visitor's session to all. Drop the cache, or set the path to false.
+[capsa] db source "default": `posts` is exported by more than one schema file (`schema/posts.ts`, `layers/blog/…`). Rename all but one.
+```
+
+**Errors that tell you what to do.**
+
+```text
+[capsa] db source "default" has no connection. Set NUXT_CAPSA_DB_DEFAULT_CONNECTION, or return a `client` from `options` in its config.ts.
+[capsa] unknown db source "logs". Configured: default, analytics.
+```
+
+**A dev loop that follows you.** Add a schema file and the drizzle-kit config is rewritten. Generate a migration and the running server applies it. Add a `config.ts` and Nuxt restarts to pick it up.
+
+**Same code, local to production.** PGlite and a folder in development, Postgres and S3 in production. Only the environment variables change.
+
+## Fast by default
+
+- **Nothing opens until it's used.** Database connections, the better-auth instance and the disks are built on first use. A database no route touches costs nothing.
+- **Only what you use ships.** Capsa knows 32 drivers, but your server bundles only yours. The same goes for drive adapters. `<Can>` and the rules engine ship only when you have rules, and a database nothing imports stays out of the bundle.
+- **One session read per request.** During SSR, every component, the middleware and `can()` share a single read. That read goes to better-auth in-process, with no HTTP round trip, and only on pages that ask for the session. In the browser it refreshes on sign-in and sign-out through better-auth's own signal, with no polling.
+- **Migrations without a filesystem.** The SQL ships inside the server bundle, so it works on serverless and Workers. When several instances start at once, a database lock lets only one of them migrate.
+- **Files don't pass through your server.** Links and redirects send the browser straight to the store. In proxy mode, files are streamed and never buffered, with `Range` support so videos can seek.
+- **Read replicas built in.** Set `NUXT_CAPSA_DB_DEFAULT_REPLICAS` and reads go to `db.$replica`.
+- **A tiny runtime.** Capsa's own dependencies are `defu`, `scule` and `verkit`. Your libraries are yours, never bundled twice.
 
 ---
 
@@ -172,22 +223,35 @@ export default defineEventHandler(async (event) => {
 })
 ```
 
-**In the app**: the session, better-auth's client, and the same rules.
+**In the app: `useCapsaSession()`.** One auto-imported composable gives you the session, better-auth's typed client and the rules. It's reactive, rendered on the server, and updated by itself after every sign-in, sign-up, sign-out or `updateUser`.
 
 ```vue
 <script setup lang="ts">
-const { user, loggedIn, client, signOut, can } = useCapsaSession()
+const { user, loggedIn, client, signOut, can, authorize } = useCapsaSession()
+
+// Gate the whole page: a refusal shows the error page with the rule's status (here a 404, as if the post didn't exist).
+const { data: post } = await useFetch(`/api/posts/${useRoute().params.id}`)
+await authorize('posts.view', post.value)
+
+const signIn = () => client.signIn.email({ email: 'ada@example.com', password: '…' })  // the user above updates by itself
 </script>
 
 <template>
+  <p v-if="loggedIn">
+    Hi {{ user?.name }}, you're on the {{ user?.plan }} plan   <!-- additionalFields are typed too -->
+    <button @click="signOut({ redirectTo: '/' })">Sign out</button>
+  </p>
+
+  <button v-if="can('schedule')">Schedule</button>
+
   <Can do="posts.edit" :with="post">
     <button>Edit</button>
-    <template #denied="{ code }">You can't edit this: {{ code }}</template>
+    <template #denied="{ code }">You can't edit this: {{ code }}</template>  <!-- 'NOT_THE_AUTHOR', typed -->
   </Can>
 </template>
 ```
 
-The session is read only on pages that use it, once per request during SSR, and is refreshed after sign-in and sign-out.
+`can()` and `<Can>` render nothing while the session is still unknown, so there's no flash of the wrong button. `<Cannot>` is the opposite of `<Can>`, and `components: { prefix: 'Auth' }` renames both if `Can` is already taken in your app.
 
 ---
 
