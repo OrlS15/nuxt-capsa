@@ -1,0 +1,22 @@
+{
+  "private": true,
+  "name": "my-module-playground",
+  "type": "module",
+  "scripts": {
+    "dev": "nuxt dev",
+    "build": "nuxt build",
+    "generate": "nuxt generate"
+  },
+  "dependencies": {
+    "@better-auth/drizzle-adapter": "1.7.7",
+    "@electric-sql/pglite": "^0.5.9",
+    "better-auth": "1.7.7",
+    "drizzle-orm": "1.0.0-rc.5",
+    "nuxt": "npm:nuxt-nightly@5.0.0-2610132251-aadc393",
+    "nuxt-capsa": "workspace:*",
+    "pg": "^8.23.1"
+  },
+  "devDependencies": {
+    "drizzle-kit": "1.0.0-rc.5"
+  }
+}

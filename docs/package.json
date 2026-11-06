@@ -1,0 +1,17 @@
+{
+  "name": "nuxt-capsa-docs",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "nuxt prepare example && nuxt dev",
+    "generate": "nuxt prepare example && nuxt generate"
+  },
+  "dependencies": {
+    "docus": "^5.14.0",
+    "nuxt": "^4.6.1"
+  },
+  "devDependencies": {
+    "@shikijs/twoslash": "^4.5.0",
+    "typescript": "^6.0.3"
+  }
+}

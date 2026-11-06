@@ -1,0 +1,33 @@
+allowBuilds:
+  better-sqlite3: true
+  esbuild: true
+  unrs-resolver: true
+  vue-demi: false
+
+minimumReleaseAgeExclude:
+  - '@nuxt/kit-nightly@5.0.0-2610132251-aadc393'
+  - '@nuxt/nitro-server-nightly@5.0.0-2610132251-aadc393'
+  - '@nuxt/schema-nightly@5.0.0-2610132251-aadc393'
+  - '@nuxt/vite-builder-nightly@5.0.0-2610132251-aadc393'
+  - '@nuxt/vite-server-nightly@5.0.0-2610132251-aadc393'
+  - nuxt-nightly@5.0.0-2610132251-aadc393
+  - vite@8.3.3
+  - playwright-core@1.65.0
+  - '@better-auth/core@1.7.18'
+  - '@better-auth/drizzle-adapter@1.7.18'
+  - '@better-auth/kysely-adapter@1.7.18'
+  - '@better-auth/memory-adapter@1.7.18'
+  - '@better-auth/mongo-adapter@1.7.18'
+  - '@better-auth/prisma-adapter@1.7.18'
+  - '@better-auth/telemetry@1.7.18'
+  - better-auth@1.7.18
+
+packages:
+  - docs
+  # The app the docs' code blocks are type-checked against: Nuxt 5, while Docus itself stays on Nuxt 4.
+  - docs/example
+  - playground
+
+# Nuxt 5 nightly renders pages in dev with vue's CommonJS build when the layout is strict (module is not defined):
+# hoisting, as npm does, fixes it. Only this repo is concerned, not the published package.
+shamefullyHoist: true

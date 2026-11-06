@@ -1,0 +1,5 @@
+{
+  "private": true,
+  "name": "db-pglite",
+  "type": "module"
+}

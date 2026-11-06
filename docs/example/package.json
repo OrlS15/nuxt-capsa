@@ -1,0 +1,8 @@
+{
+  "name": "capsa-docs-example",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "nuxt": "npm:nuxt-nightly@5.0.0-2610132251-aadc393"
+  }
+}

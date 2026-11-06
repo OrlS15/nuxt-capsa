@@ -1,0 +1,11 @@
+{
+  "extends": "./.nuxt/tsconfig.json",
+  "exclude": [
+    "dist",
+    "node_modules",
+    "docs",
+    "playground",
+    // Each fixture is an app of its own, typed by its own .nuxt.
+    "test/fixtures",
+  ]
+}

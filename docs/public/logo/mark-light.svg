@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="48 48 416 416">
+<defs><mask id="cut"><rect width="512" height="512" fill="#fff"/><rect x="163" y="223" width="126" height="126" rx="35"/></mask></defs>
+<g fill="none" stroke-width="64" stroke-linecap="round" stroke-linejoin="round">
+<path d="M216 86H126Q86 86 86 126V386Q86 426 126 426H216" stroke="#00DC82"/>
+<path d="M296 86H386Q426 86 426 126V386Q426 426 386 426H296" stroke="#020420"/>
+</g>
+<rect x="232" y="172" width="108" height="108" rx="26" fill="#020420" mask="url(#cut)"/>
+<rect x="172" y="232" width="108" height="108" rx="26" fill="#00DC82"/>
+</svg>
