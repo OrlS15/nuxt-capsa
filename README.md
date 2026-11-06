@@ -1,11 +1,15 @@
 # nuxt-capsa
 
-**The missing wiring for Nuxt.** Database, auth and file storage, ready for production, with almost no config.
+**The missing wiring for Nuxt.** A batteries-included backend for production apps: everything a real app needs on the server, already wired into Nuxt, with as little config as possible.
 
 > [!WARNING]
 > **Not published yet.** Capsa is an experiment: it isn't on npm, it runs on Nuxt 5 nightly, and every API below may still change. Don't use it in production.
 
-Capsa doesn't replace the libraries you know. You install [Drizzle](https://orm.drizzle.team), [better-auth](https://better-auth.com) and [files-sdk](https://files-sdk.dev) yourself. You turn a feature on in `nuxt.config.ts` and write your files in the folders Capsa expects. Capsa generates the code that wires them into Nuxt:
+Every production app rebuilds the same backend plumbing: a database with migrations, sign-in and permissions, file storage, and next emails, background jobs and validated config. Capsa gives you each one as a **feature** that you turn on in `nuxt.config.ts`.
+
+**Available today:** [Database](#database), [Auth](#auth), [Drive](#drive). **Coming next:** mailer, queues, typed runtime config, a database studio ([roadmap](#roadmap)).
+
+Each feature is built on a library you already know and install yourself. Today those are [Drizzle](https://orm.drizzle.team), [better-auth](https://better-auth.com) and [files-sdk](https://files-sdk.dev). You write your files in the folders Capsa expects, and Capsa generates the code that wires them into Nuxt:
 
 - typed auto-imports for server and app code
 - connections and secrets from environment variables
@@ -25,7 +29,7 @@ export default defineNuxtConfig({
 })
 ```
 
-That's the whole config. Everything else is a file in a known place:
+That's the whole config for the three features available today. Everything else is a file in a known place:
 
 ```bash
 server/capsa/
@@ -266,18 +270,23 @@ Capsa never bundles Drizzle, better-auth or files-sdk. The code it generates imp
 ```bash
 git clone <this repo> && cd nuxt-capsa
 pnpm install
-pnpm dev     # the playground: a database, auth with rules, a login page
+pnpm dev     # the playground: every feature, on two databases, a login and a files page
 pnpm test    # ~230 tests in ~8 s, with no database server or browser
 ```
 
 ## Roadmap
 
-- [x] Database (Drizzle)
-- [x] Auth (better-auth)
-- [x] Drive (files-sdk)
-- [ ] Mailer
-- [ ] Queue
-- [ ] Runtime config with schema validation
+Capsa grows one feature at a time, each built on a library you install and wired the same way: one key in `nuxt.config.ts`, files in known folders, and typed auto-imports.
+
+| Feature | Status |
+|---|---|
+| Database (Drizzle) | ✅ available |
+| Auth (better-auth) | ✅ available |
+| Drive (files-sdk) | ✅ available |
+| Database studio | planned |
+| Mailer | exploring |
+| Queues and background jobs | exploring |
+| Runtime config validated by a schema | exploring |
 
 ## License
 
