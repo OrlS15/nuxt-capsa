@@ -11,11 +11,23 @@ export default defineNuxtConfig({
         dataDir: '.data/capsa',
         migrations: 'onStart',
       },
+      // A second database, on SQLite: its migrations run when code asks for them (server/api/visits.post.ts).
+      analytics: {
+        provider: 'drizzle',
+        dialect: 'sqlite',
+        driver: 'node-sqlite',
+        dataDir: '.data/capsa',
+        migrations: 'manual',
+      },
     },
     auth: {
-      // Signed-in visitors skip the login page.
-      routes: { '/login': 'guest' },
+      // Signed-in visitors skip the login page, signed-out ones never reach the files.
+      routes: { '/login': 'guest', '/files': 'user' },
       redirects: { user: '/login', guest: '/abilities' },
+    },
+    drive: {
+      // A folder of this machine: capsa signs its links, as S3 would.
+      default: { adapter: 'fs' },
     },
   },
   /* $development: {

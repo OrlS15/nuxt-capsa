@@ -1,7 +1,7 @@
 <template>
   <div>
     <nav>
-      <NuxtLink to="/">Database</NuxtLink> · <NuxtLink to="/abilities">Abilities</NuxtLink> · <NuxtLink to="/login">Login</NuxtLink>
+      <NuxtLink to="/">Database</NuxtLink> · <NuxtLink to="/abilities">Abilities</NuxtLink> · <NuxtLink to="/files">Files</NuxtLink> · <NuxtLink to="/login">Login</NuxtLink>
     </nav>
     <NuxtPage />
   </div>
